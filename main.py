@@ -1,7 +1,7 @@
 import arcade
 import requests
 import os
-from support import *
+from api_work import *
 
 SCREEN_WIDTH = 650
 SCREEN_HEIGHT = 450
@@ -53,6 +53,10 @@ class OutputMap(arcade.Window):
                     longitude, latitude = self.ll.split(",")
                     self.ll = movement(longitude, latitude, key)
                     self.up_im = not(self.up_im)
+                if key in [arcade.key.PAGEUP, arcade.key.PAGEDOWN]:
+                    delta1, delta2 = self.spn.split(",")
+                    self.spn = up_down_map(delta1, delta2, key)
+                    self.up_im = not (self.up_im)
 
         if self.up_im:
             self.update_image()

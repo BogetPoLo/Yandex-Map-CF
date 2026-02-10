@@ -1,14 +1,13 @@
 import arcade
 import requests
 import os
-
-from pyglet.event import EVENT_HANDLE_STATE
+from support import *
 
 SCREEN_WIDTH = 650
 SCREEN_HEIGHT = 450
 SCREEN_TITLE = "Янедкс карты"
 MAP_FILE = "map.png"
-
+ALL_KEY = [arcade.key.UP, arcade.key.DOWN, arcade.key.RIGHT, arcade.key.LEFT, arcade.key.PAGEUP, arcade.key.PAGEDOWN]
 
 class OutputMap(arcade.Window):
     def __init__(self, width, height, title):
@@ -48,15 +47,31 @@ class OutputMap(arcade.Window):
         )
 
     def on_update(self, delta_time):
+        for key in ALL_KEY:
+            if key in self.press_keys:
+                if key in [arcade.key.UP, arcade.key.DOWN, arcade.key.RIGHT, arcade.key.LEFT]:
+                    longitude, latitude = self.ll.split(",")
+                    self.ll = movement(longitude, latitude, key)
+                    self.up_im = not(self.up_im)
+
         if self.up_im:
             self.update_image()
 
 
     def update_image(self):
+        params = {
+            "ll": self.ll,
+            "spn": self.spn,
+            "apikey": self.apikey,
+            "size": "650,450"
+        }
+        self.response = requests.get(self.api_serv, params)
+
         if self.response:
             with open(MAP_FILE, "wb") as f:
                 f.write(self.response.content)
             self.background = arcade.load_texture(MAP_FILE)
+        self.up_im = not(self.up_im)
 
     def on_key_press(self, key, modifiers):
         self.press_keys.append(key)

@@ -1,4 +1,5 @@
 import arcade
+from arcade.gui import UIManager, UITextureButton, UIAnchorLayout, UIBoxLayout
 import requests
 import os
 from api_work import *
@@ -7,7 +8,9 @@ SCREEN_WIDTH = 650
 SCREEN_HEIGHT = 450
 SCREEN_TITLE = "Янедкс карты"
 MAP_FILE = "map.png"
-ALL_KEY = [arcade.key.UP, arcade.key.DOWN, arcade.key.RIGHT, arcade.key.LEFT, arcade.key.PAGEUP, arcade.key.PAGEDOWN]
+ALL_KEY = [arcade.key.UP, arcade.key.DOWN, arcade.key.RIGHT, arcade.key.LEFT,
+           arcade.key.PAGEUP, arcade.key.PAGEDOWN,
+           arcade.key.D, arcade.key.L]
 
 class OutputMap(arcade.Window):
     def __init__(self, width, height, title):
@@ -22,20 +25,36 @@ class OutputMap(arcade.Window):
         self.apikey = "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13"
         self.ll = '37.621351,55.753349'
         self.spn = "0.2,0.2"
+        self.theme = "light"
 
     def setup(self):
-        params = {
-            "ll": self.ll,
-            "spn": self.spn,
-            "apikey": self.apikey,
-            "size": "650,450"
-        }
-        self.response = requests.get(self.api_serv, params)
         self.update_image()
+
+        self.manager = UIManager()
+        self.manager.enable()
+
+        self.setup_widgets()
+
+    def setup_widgets(self):
+        texture_normal = arcade.load_texture(":resources:/gui_basic_assets/button/red_normal.png")
+        texture_hovered = arcade.load_texture(":resources:/gui_basic_assets/button/red_hover.png")
+        texture_pressed = arcade.load_texture(":resources:/gui_basic_assets/button/red_press.png")
+        texture_button = UITextureButton(texture=texture_normal,
+                                         texture_hovered=texture_hovered,
+                                         texture_pressed=texture_pressed,
+                                         scale=1.0,
+                                         text="тема",
+                                         x=10,
+                                         y=10,
+                                         width=1000,
+                                         height=1000)
+        self.manager.add(texture_button)
+        texture_button.on_click = self.color_map_button
 
     def on_draw(self):
         self.clear()
 
+        self.manager.draw()
         arcade.draw_texture_rect(
             self.background,
             arcade.LBWH(
@@ -45,6 +64,7 @@ class OutputMap(arcade.Window):
                 self.background.height
             ),
         )
+        self.manager.draw()
 
     def on_update(self, delta_time):
         for key in ALL_KEY:
@@ -57,17 +77,28 @@ class OutputMap(arcade.Window):
                     delta1, delta2 = self.spn.split(",")
                     self.spn = up_down_map(delta1, delta2, key)
                     self.up_im = not (self.up_im)
+                if key == arcade.key.D:
+                    self.theme = color_map(self.theme)
+                    self.up_im = not (self.up_im)
+                if key == arcade.key.L:
+                    self.theme = color_map(self.theme)
+                    self.up_im = not (self.up_im)
+
 
         if self.up_im:
             self.update_image()
 
+    def color_map_button(self, event):
+        self.theme = color_map(self.theme)
+        self.up_im = not (self.up_im)
 
     def update_image(self):
         params = {
             "ll": self.ll,
             "spn": self.spn,
             "apikey": self.apikey,
-            "size": "650,450"
+            "size": "650,450",
+            "theme": self.theme
         }
         self.response = requests.get(self.api_serv, params)
 

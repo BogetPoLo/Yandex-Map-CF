@@ -1,6 +1,6 @@
 import arcade.key
 import requests
-123
+
 def up_down_map(delta1, delta2, key):
     print(delta2, delta2)
     if key == arcade.key.PAGEUP:
@@ -34,3 +34,10 @@ def movement(longitude, latitude, key):
     elif key == arcade.key.RIGHT:
         longitude = str(float(longitude) + 0.05)
     return f"{longitude},{latitude}"
+
+
+def color_map(color):
+    if color == "light":
+        return "dark"
+    else:
+        return "light"

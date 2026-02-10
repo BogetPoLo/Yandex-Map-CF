@@ -2,6 +2,8 @@ import arcade
 import requests
 import os
 
+from pyglet.event import EVENT_HANDLE_STATE
+
 SCREEN_WIDTH = 650
 SCREEN_HEIGHT = 450
 SCREEN_TITLE = "Янедкс карты"
@@ -12,6 +14,25 @@ class OutputMap(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
         arcade.set_background_color(arcade.color.GRAY)
+
+        self.press_keys = []
+        self.up_im = False
+        self.response = None
+
+        self.api_serv = "https://static-maps.yandex.ru/v1"
+        self.apikey = "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13"
+        self.ll = '37.621351,55.753349'
+        self.spn = "0.2,0.2"
+
+    def setup(self):
+        params = {
+            "ll": self.ll,
+            "spn": self.spn,
+            "apikey": self.apikey,
+            "size": "650,450"
+        }
+        self.response = requests.get(self.api_serv, params)
+        self.update_image()
 
     def on_draw(self):
         self.clear()
@@ -26,25 +47,23 @@ class OutputMap(arcade.Window):
             ),
         )
 
-    def setup(self):
-        api_serv = "https://static-maps.yandex.ru/v1"
-        apikey = "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13"
-        ll = '37.621351,55.753349'
-        spn = "0.2,0.2"
+    def on_update(self, delta_time):
+        if self.up_im:
+            self.update_image()
 
-        params = {
-            "ll": ll,
-            "spn": spn,
-            "apikey": apikey,
-            "size": "650,450"
-        }
-        response = requests.get(api_serv, params)
-        print(response)
-        if response:
+
+    def update_image(self):
+        if self.response:
             with open(MAP_FILE, "wb") as f:
-                f.write(response.content)
-            print(123)
+                f.write(self.response.content)
             self.background = arcade.load_texture(MAP_FILE)
+
+    def on_key_press(self, key, modifiers):
+        self.press_keys.append(key)
+
+    def on_key_release(self, key, modifiers):
+        self.press_keys.remove(key)
+
 
 def setup_game(width=800, height=600, title="Space Race"):
     game = OutputMap(width, height, title)
@@ -56,7 +75,6 @@ def main():
     setup_game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     arcade.run()
     os.remove(MAP_FILE)
-
 
 if __name__ == "__main__":
     main()

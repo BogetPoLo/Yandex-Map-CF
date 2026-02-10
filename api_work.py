@@ -98,3 +98,10 @@ def movement(longitude, latitude, key):
     elif key == arcade.key.RIGHT:
         longitude = str(float(longitude) + 0.05)
     return f"{longitude},{latitude}"
+
+
+def color_map(color):
+    if color == "light":
+        return "dark"
+    else:
+        return "light"

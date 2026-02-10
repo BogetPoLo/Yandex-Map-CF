@@ -1,6 +1,6 @@
 import arcade.key
 import requests
-
+123
 def up_down_map(delta1, delta2, key):
     print(delta2, delta2)
     if key == arcade.key.PAGEUP:

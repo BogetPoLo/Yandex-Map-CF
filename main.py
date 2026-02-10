@@ -1,16 +1,15 @@
 import arcade
-from arcade.gui import UIManager, UITextureButton, UIAnchorLayout, UIBoxLayout
+from arcade.gui import UIManager, UITextureButton, UIAnchorLayout, UIBoxLayout, UIInputText
 import requests
 import os
 from api_work import *
 
 SCREEN_WIDTH = 650
-SCREEN_HEIGHT = 450
+SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Янедкс карты"
 MAP_FILE = "map.png"
 ALL_KEY = [arcade.key.UP, arcade.key.DOWN, arcade.key.RIGHT, arcade.key.LEFT,
-           arcade.key.PAGEUP, arcade.key.PAGEDOWN,
-           arcade.key.D, arcade.key.L]
+           arcade.key.PAGEUP, arcade.key.PAGEDOWN]
 
 class OutputMap(arcade.Window):
     def __init__(self, width, height, title):
@@ -45,11 +44,26 @@ class OutputMap(arcade.Window):
                                          scale=1.0,
                                          text="тема",
                                          x=10,
-                                         y=10,
+                                         y=10)
+        self.manager.add(texture_button)
+        texture_button.on_click = self.color_map_button
+
+        input_line = UIInputText(x=0, y=540, width=400, height=50, text="")
+        self.manager.add(input_line)
+
+        texture_normal = arcade.load_texture(":resources:/gui_basic_assets/button/red_normal.png")
+        texture_hovered = arcade.load_texture(":resources:/gui_basic_assets/button/red_hover.png")
+        texture_pressed = arcade.load_texture(":resources:/gui_basic_assets/button/red_press.png")
+        texture_button = UITextureButton(texture=texture_normal,
+                                         texture_hovered=texture_hovered,
+                                         texture_pressed=texture_pressed,
+                                         scale=1.0,
+                                         text="Искать",
+                                         x=410,
+                                         y=540,
                                          width=1000,
                                          height=1000)
         self.manager.add(texture_button)
-        texture_button.on_click = self.color_map_button
 
     def on_draw(self):
         self.clear()
@@ -76,12 +90,6 @@ class OutputMap(arcade.Window):
                 if key in [arcade.key.PAGEUP, arcade.key.PAGEDOWN]:
                     delta1, delta2 = self.spn.split(",")
                     self.spn = up_down_map(delta1, delta2, key)
-                    self.up_im = not (self.up_im)
-                if key == arcade.key.D:
-                    self.theme = color_map(self.theme)
-                    self.up_im = not (self.up_im)
-                if key == arcade.key.L:
-                    self.theme = color_map(self.theme)
                     self.up_im = not (self.up_im)
 
 

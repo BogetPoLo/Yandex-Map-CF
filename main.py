@@ -34,6 +34,8 @@ class OutputMap(arcade.Window):
         self.press_keys = []
         self.up_im = False
         self.sear = True
+        self.point = None
+        self.ll_org = None
         self.response = None
 
         self.api_serv = "https://static-maps.yandex.ru/v1"
@@ -148,15 +150,14 @@ class OutputMap(arcade.Window):
 
     def button_enter(self, event):
         text_ln = self.input_line.text
-        self.ll = search_organization(text_ln)
+        self.ll_org = search_organization(text_ln)
         self.up_im = True
         self.sear = True
 
     def update_image(self, search=False):
         try:
-            point = None
             if search:
-                point = "{0},pm2dgl".format(self.ll)
+                self.point = "{0},pm2dgl".format(self.ll_org)
                 self.sear = False
             params = {
                 "ll": self.ll,
@@ -164,7 +165,7 @@ class OutputMap(arcade.Window):
                 "apikey": self.apikey,
                 "size": "650,450",
                 "theme": self.theme,
-                "pt": point
+                "pt": self.point
             }
             logging.info("Запрос к API: %s с параметрами %s", self.api_serv, params)
             response = requests.get(self.api_serv, params, timeout=10)

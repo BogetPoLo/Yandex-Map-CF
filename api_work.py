@@ -12,6 +12,9 @@ KEY_NAMES = {
     arcade.key.PAGEUP: "PAGEUP",
     arcade.key.PAGEDOWN: "PAGEDOWN"
 }
+SERVER_ADDRESS = "http://geocode-maps.yandex.ru/1.x/?"
+API_KEY = "8013b162-6b42-4997-9691-77b7074026e0"
+
 
 def get_key_name(key):
     return KEY_NAMES.get(key, f"KEY_{key}")
@@ -234,17 +237,37 @@ def color_map(color):
 
 
 def search_organization(name):
-    server_address = "http://geocode-maps.yandex.ru/1.x/?"
-    api_key = "8013b162-6b42-4997-9691-77b7074026e0"
     geocode = name
 
     params = {
-        "apikey": api_key,
-        "geocode": name,
+        "apikey": API_KEY,
+        "geocode": geocode,
         "format": "json"
     }
-    response = requests.get(server_address, params)
+    response = requests.get(SERVER_ADDRESS, params)
     json_response = response.json()
     pos_ll = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
     pos_ll = pos_ll.replace(" ", ",")
     return pos_ll
+
+
+def output_address(ll):
+    geocode = ll
+
+    params = {
+        "apikey": API_KEY,
+        "geocode": geocode,
+        "format": "json"
+    }
+    response = requests.get(SERVER_ADDRESS, params)
+    if response:
+        json_response = response.json()
+        pprint.pprint(json_response)
+        resp_all = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]
+        resp_adr = resp_all["formatted"]
+        if "postal_code" in resp_all:
+            resp_code = resp_all["postal_code"]
+        else:
+            return f"{resp_adr}, почтового индекса нет"
+        return f"{resp_adr}, {resp_code}"
+    return ""

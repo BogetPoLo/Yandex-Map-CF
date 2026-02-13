@@ -33,7 +33,7 @@ class OutputMap(arcade.Window):
 
         self.press_keys = []
         self.up_im = False
-        self.sear = True
+        self.sear = False
         self.point = None
         self.ll_org = None
         self.response = None
@@ -148,7 +148,7 @@ class OutputMap(arcade.Window):
                     elif key == arcade.key.ENTER:
                         self.button_enter(None)
             if self.up_im:
-                self.update_image(self.sear)
+                self.update_image()
         except Exception as e:
             logging.error("Ошибка при обновлении: %s", e)
 
@@ -162,7 +162,9 @@ class OutputMap(arcade.Window):
 
     def button_enter(self, event):
         text_ln = self.input_line.text
-        self.ll_org = search_organization(text_ln)
+        ll = search_organization(text_ln)
+        self.ll_org = ll
+        self.ll = ll
         self.up_im = True
         self.sear = True
 
@@ -170,9 +172,9 @@ class OutputMap(arcade.Window):
         self.point = None
         self.up_im = True
 
-    def update_image(self, search=False):
+    def update_image(self):
         try:
-            if search:
+            if self.sear:
                 self.point = "{0},pm2dgl".format(self.ll_org)
                 self.sear = False
             params = {

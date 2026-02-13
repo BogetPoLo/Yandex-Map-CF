@@ -157,6 +157,7 @@ class OutputMap(arcade.Window):
             point = None
             if search:
                 point = "{0},pm2dgl".format(self.ll)
+                self.sear = False
             params = {
                 "ll": self.ll,
                 "spn": self.spn,

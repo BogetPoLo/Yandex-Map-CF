@@ -37,6 +37,9 @@ class OutputMap(arcade.Window):
         self.point = None
         self.ll_org = None
         self.response = None
+        self.pos_code = ""
+        self.text_address = ""
+        self.pos_code_flag = False
 
         self.api_serv = "https://static-maps.yandex.ru/v1"
         self.apikey = "f3a0fe3a-b07e-4840-a1da-06f18b2ddf13"
@@ -112,6 +115,18 @@ class OutputMap(arcade.Window):
             self.manager.add(self.output_line)
             logging.info("Поле вывода информации")
 
+            code_button = UITextureButton(
+                texture=texture_normal,
+                texture_hovered=texture_hovered,
+                texture_pressed=texture_pressed,
+                scale=1.0,
+                text="индекс",
+                x=435,
+                y=10
+            )
+            code_button.on_click = self.show_the_index
+            self.manager.add(code_button)
+
         except Exception as e:
             logging.error("Ошибка при создании виджетов: %s", e)
 
@@ -172,14 +187,24 @@ class OutputMap(arcade.Window):
         self.up_im = True
         self.sear = True
 
-        full_address = output_address(self.ll)
-        self.output_line.text = full_address
+        self.text_address, self.pos_code = output_address(self.ll)
+        self.output_line.text = f"{self.text_address}, {self.pos_code}"
+
+    def show_the_index(self, event):
+        if self.pos_code_flag:
+            self.output_line.text = f"{self.text_address}, {self.pos_code}"
+        else:
+            self.output_line.text = self.text_address
+        self.pos_code_flag = not(self.pos_code_flag)
 
     def del_point(self, event):
         self.point = None
         self.up_im = True
-
+        self.pos_code_flag = False
+        self.text_address = ""
+        self.pos_code = ""
         self.output_line.text = ""
+        self.input_line.text = ""
 
     def update_image(self):
         try:

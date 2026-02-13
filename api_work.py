@@ -262,12 +262,11 @@ def output_address(ll):
     response = requests.get(SERVER_ADDRESS, params)
     if response:
         json_response = response.json()
-        pprint.pprint(json_response)
         resp_all = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]
         resp_adr = resp_all["formatted"]
         if "postal_code" in resp_all:
             resp_code = resp_all["postal_code"]
         else:
-            return f"{resp_adr}, почтового индекса нет"
-        return f"{resp_adr}, {resp_code}"
+            return [resp_adr, "почтового индекса нет"]
+        return [resp_adr, resp_code]
     return ""

@@ -21,7 +21,8 @@ SCREEN_TITLE = "Яндекс карты"
 MAP_FILE = "map.png"
 ALL_KEY = [
     arcade.key.UP, arcade.key.DOWN, arcade.key.RIGHT, arcade.key.LEFT,
-    arcade.key.PAGEUP, arcade.key.PAGEDOWN
+    arcade.key.PAGEUP, arcade.key.PAGEDOWN,
+    arcade.key.ENTER
 ]
 
 class OutputMap(arcade.Window):
@@ -32,6 +33,7 @@ class OutputMap(arcade.Window):
 
         self.press_keys = []
         self.up_im = False
+        self.sear = True
         self.response = None
 
         self.api_serv = "https://static-maps.yandex.ru/v1"
@@ -72,8 +74,8 @@ class OutputMap(arcade.Window):
             logging.info("Кнопка 'тема' добавлена.")
 
             # Поле ввода
-            input_line = UIInputText(x=0, y=540, width=400, height=50, text="")
-            self.manager.add(input_line)
+            self.input_line = UIInputText(x=0, y=540, width=400, height=50, text="")
+            self.manager.add(self.input_line)
             logging.info("Поле ввода добавлено.")
 
             # Кнопка поиска
@@ -88,6 +90,7 @@ class OutputMap(arcade.Window):
                 width=1000,
                 height=1000
             )
+            search_button.on_click = self.button_enter
             self.manager.add(search_button)
             logging.info("Кнопка 'Искать' добавлена.")
 
@@ -128,9 +131,10 @@ class OutputMap(arcade.Window):
                         self.spn = up_down_map(delta1, delta2, key)
                         logging.info("Масштаб изменён: spn=%s", self.spn)
                         self.up_im = True
-
+                    elif key == arcade.key.ENTER:
+                        self.button_enter(None)
             if self.up_im:
-                self.update_image()
+                self.update_image(self.sear)
         except Exception as e:
             logging.error("Ошибка при обновлении: %s", e)
 
@@ -142,14 +146,24 @@ class OutputMap(arcade.Window):
         except Exception as e:
             logging.error("Ошибка при смене темы: %s", e)
 
-    def update_image(self):
+    def button_enter(self, event):
+        text_ln = self.input_line.text
+        self.ll = search_organization(text_ln)
+        self.up_im = True
+        self.sear = True
+
+    def update_image(self, search=False):
         try:
+            point = None
+            if search:
+                point = "{0},pm2dgl".format(self.ll)
             params = {
                 "ll": self.ll,
                 "spn": self.spn,
                 "apikey": self.apikey,
                 "size": "650,450",
-                "theme": self.theme
+                "theme": self.theme,
+                "pt": point
             }
             logging.info("Запрос к API: %s с параметрами %s", self.api_serv, params)
             response = requests.get(self.api_serv, params, timeout=10)

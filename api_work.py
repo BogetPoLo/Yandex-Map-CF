@@ -1,3 +1,5 @@
+import pprint
+import requests
 import arcade.key
 import logging
 
@@ -229,3 +231,20 @@ def color_map(color):
     except Exception as e:
         logging.error("Ошибка при смене темы: %s", e)
         return "light"
+
+
+def search_organization(name):
+    server_address = "http://geocode-maps.yandex.ru/1.x/?"
+    api_key = "8013b162-6b42-4997-9691-77b7074026e0"
+    geocode = name
+
+    params = {
+        "apikey": api_key,
+        "geocode": name,
+        "format": "json"
+    }
+    response = requests.get(server_address, params)
+    json_response = response.json()
+    pos_ll = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
+    pos_ll = pos_ll.replace(" ", ",")
+    return pos_ll

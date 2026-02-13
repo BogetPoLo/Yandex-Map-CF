@@ -16,7 +16,7 @@ logging.basicConfig(
 )
 
 SCREEN_WIDTH = 650
-SCREEN_HEIGHT = 600
+SCREEN_HEIGHT = 650
 SCREEN_TITLE = "Яндекс карты"
 MAP_FILE = "map.png"
 ALL_KEY = [
@@ -76,7 +76,7 @@ class OutputMap(arcade.Window):
             logging.info("Кнопка 'тема' добавлена.")
 
             # Поле ввода
-            self.input_line = UIInputText(x=0, y=540, width=400, height=50, text="")
+            self.input_line = UIInputText(x=0, y=525, width=400, height=50, text="")
             self.manager.add(self.input_line)
             logging.info("Поле ввода добавлено.")
 
@@ -88,7 +88,7 @@ class OutputMap(arcade.Window):
                 scale=1.0,
                 text="Искать",
                 x=410,
-                y=540,
+                y=525,
                 width=1000,
                 height=1000
             )
@@ -108,6 +108,10 @@ class OutputMap(arcade.Window):
             del_point_button.on_click = self.del_point
             self.manager.add(del_point_button)
 
+            self.output_line = UIInputText(x=0, y=590, width=600, height=50, text="")
+            self.manager.add(self.output_line)
+            logging.info("Поле вывода информации")
+
         except Exception as e:
             logging.error("Ошибка при создании виджетов: %s", e)
 
@@ -120,7 +124,7 @@ class OutputMap(arcade.Window):
                     self.background,
                     arcade.LBWH(
                         (self.width - self.background.width) // 2,
-                        (self.height - self.background.height) // 2,
+                        70,
                         self.background.width,
                         self.background.height
                     ),
@@ -168,9 +172,14 @@ class OutputMap(arcade.Window):
         self.up_im = True
         self.sear = True
 
+        full_address = output_address(self.ll)
+        self.output_line.text = full_address
+
     def del_point(self, event):
         self.point = None
         self.up_im = True
+
+        self.output_line.text = ""
 
     def update_image(self):
         try:

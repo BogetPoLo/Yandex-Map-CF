@@ -96,6 +96,18 @@ class OutputMap(arcade.Window):
             self.manager.add(search_button)
             logging.info("Кнопка 'Искать' добавлена.")
 
+            del_point_button = UITextureButton(
+                texture=texture_normal,
+                texture_hovered=texture_hovered,
+                texture_pressed=texture_pressed,
+                scale=1.0,
+                text="очистить",
+                x=220,
+                y=10
+            )
+            del_point_button.on_click = self.del_point
+            self.manager.add(del_point_button)
+
         except Exception as e:
             logging.error("Ошибка при создании виджетов: %s", e)
 
@@ -153,6 +165,10 @@ class OutputMap(arcade.Window):
         self.ll_org = search_organization(text_ln)
         self.up_im = True
         self.sear = True
+
+    def del_point(self, event):
+        self.point = None
+        self.up_im = True
 
     def update_image(self, search=False):
         try:
